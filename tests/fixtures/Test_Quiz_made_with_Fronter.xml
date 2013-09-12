@@ -1,0 +1,130 @@
+<?xml version = "1.0" encoding="utf-8"?>
+<!-- Created by Fronter Test Tool -->
+<!-- Exported by: Lars Bjørstrup-->
+<!-- Date: 2013-07-02 -->
+<questestinterop>
+<item ident="test_31009_question_221569">
+<presentation label="question_221569">
+<flow>
+<material label="question">
+<mattext><![CDATA[What color is an elephant?]]></mattext>
+</material>
+<material label="comment">
+<mattext><![CDATA[<p>
+	Read the book to learn more.&nbsp;<span style="font-size: 9pt;">This assignemnt is mandatory.</span></p>
+]]></mattext>
+</material>
+<response_lid ident="Q221569">
+<render_choice minnumber="1" maxnumber="1">
+<response_label ident="alt947373">
+<flow_mat>
+<material><mattext><![CDATA[Elefants are blue]]></mattext></material>
+</flow_mat>
+</response_label>
+<response_label ident="alt947374">
+<flow_mat>
+<material><mattext><![CDATA[Elephants are grey]]></mattext></material>
+</flow_mat>
+</response_label>
+<response_label ident="alt947375">
+<flow_mat>
+<material><mattext><![CDATA[Elephants are red]]></mattext></material>
+</flow_mat>
+</response_label>
+</render_choice>
+</response_lid>
+</flow>
+</presentation>
+<resprocessing>
+<outcomes>
+<decvar varname="SCORE221569" integer="integer" defaultval="0" maxvalue="1.00" minvalue="0.00"/>
+</outcomes>
+<respcondition>
+<conditionvar>
+<not>
+<varequal respident="Q221569">alt947373</varequal>
+</not>
+</conditionvar>
+<setvar action="add" varname="SCORE221569">0.00</setvar>
+<displayfeedback feedbacktype="response" linkrefid="FEEDBACK221569"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+<varequal respident="Q221569">alt947374</varequal>
+</conditionvar>
+<setvar action="add" varname="SCORE221569">1.00</setvar>
+<displayfeedback feedbacktype="response" linkrefid="FEEDBACK221569"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+<not>
+<varequal respident="Q221569">alt947375</varequal>
+</not>
+</conditionvar>
+<setvar action="add" varname="SCORE221569">0.00</setvar>
+<displayfeedback feedbacktype="response" linkrefid="FEEDBACK221569"/>
+</respcondition>
+</resprocessing>
+</item>
+<item ident="test_31009_question_221570">
+<presentation label="question_221570">
+<flow>
+<material label="question">
+<mattext><![CDATA[What happens when it rains?]]></mattext>
+</material>
+<material label="comment">
+<mattext><![CDATA[<p>
+	Check all answers that apply</p>
+]]></mattext>
+</material>
+<response_lid ident="Q221570">
+<render_choice minnumber="1" maxnumber="3">
+<response_label ident="alt947376">
+<flow_mat>
+<material><mattext><![CDATA[You can get wet]]></mattext></material>
+</flow_mat>
+</response_label>
+<response_label ident="alt947377">
+<flow_mat>
+<material><mattext><![CDATA[Sky will be grey]]></mattext></material>
+</flow_mat>
+</response_label>
+<response_label ident="alt947378">
+<flow_mat>
+<material><mattext><![CDATA[There will always be a rainbow]]></mattext></material>
+</flow_mat>
+</response_label>
+</render_choice>
+</response_lid>
+</flow>
+</presentation>
+<resprocessing>
+<outcomes>
+<decvar varname="SCORE221570" integer="integer" defaultval="0" maxvalue="1.00" minvalue="0.00"/>
+</outcomes>
+<respcondition>
+<conditionvar>
+<varequal respident="Q221570">alt947376</varequal>
+</conditionvar>
+<setvar action="add" varname="SCORE221570">0.50</setvar>
+<displayfeedback feedbacktype="response" linkrefid="FEEDBACK221570"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+<varequal respident="Q221570">alt947377</varequal>
+</conditionvar>
+<setvar action="add" varname="SCORE221570">0.50</setvar>
+<displayfeedback feedbacktype="response" linkrefid="FEEDBACK221570"/>
+</respcondition>
+<respcondition>
+<conditionvar>
+<not>
+<varequal respident="Q221570">alt947378</varequal>
+</not>
+</conditionvar>
+<setvar action="add" varname="SCORE221570">0.00</setvar>
+<displayfeedback feedbacktype="response" linkrefid="FEEDBACK221570"/>
+</respcondition>
+</resprocessing>
+</item>
+</questestinterop>
