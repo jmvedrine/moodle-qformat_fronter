@@ -51,6 +51,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * @return array (of objects) questions objects.
      */
     protected function readquestions($lines) {
+	    question_bank::get_qtype('multianswer'); // Ensure the multianswer code is loaded.
         $text = implode($lines, ' ');
         unset($lines);
         // This converts xml to big nasty data structure,
@@ -69,7 +70,6 @@ class qformat_fronter extends qformat_based_on_xml {
                 array(), false);
         // Each <item> tag contains data related to a single question.
         foreach ($rawquestions as $quest) {
-        var_dump($quest);
             // Second step : parse each question data into the intermediate
             // rawquestion structure array.
             // Warning : rawquestions are not Moodle questions.
@@ -82,11 +82,10 @@ class qformat_fronter extends qformat_based_on_xml {
                 case 'dropdownselect':
                     $this->process_select($question, $questions);
                     break;
-                case 'text':
+                case 'essay':
                     $this->process_essay($question, $questions);
                     break;
                 case 'description':
-                echo 'description coucou 1';
                     $this->process_description($question, $questions);
                     break;
                 default:
@@ -209,8 +208,6 @@ class qformat_fronter extends qformat_based_on_xml {
                 $this->process_matching_responses($respconditions, $responses);
             } else {
                 $this->process_responses($respconditions, $responses);
-                echo "return from process responses";
-                var_dump($responses);
             }
             $rawquestion->responses = $responses;
         }
@@ -370,8 +367,6 @@ class qformat_fronter extends qformat_based_on_xml {
      */
     protected function process_responses($bbresponses, &$responses) {
         foreach ($bbresponses as $bbresponse) {
-        echo "bbresponse";
-        var_dump($bbresponse);
             $response = new stdClass();
             $response->ident = array();
             if ($this->getpath($bbresponse,
@@ -379,8 +374,6 @@ class qformat_fronter extends qformat_based_on_xml {
                 $responseset = $this->getpath($bbresponse,
                     array('#', 'conditionvar', 0, '#', 'not'), array(), false);
                 foreach ($responseset as $rs) {
-                echo 'rs cas not';
-                var_dump($rs);
                     $response->ident[] = $this->getpath($rs, array('#', 'varequal'), array(), false);
                     if (!isset($response->feedback) and $this->getpath($rs, array('@'), false, false)) {
                         $response->feedback = $this->getpath($rs,
@@ -391,14 +384,11 @@ class qformat_fronter extends qformat_based_on_xml {
                 $responseset = $this->getpath($bbresponse,
                     array('#', 'conditionvar'), array(), false);
                 foreach ($responseset as $rs) {
-                echo 'rs cas normal';
-                var_dump($rs);
                     $response->ident[] = $this->getpath($rs, array('#', 'varequal'), array(), false);
                     if (!isset($response->feedback) and $this->getpath($rs, array('@'), false, false)) {
                         $response->feedback = $this->getpath($rs,
                                 array('@', 'respident'), '', true);
                     }
-                echo 'response cas normal';
                 }
 
             }
@@ -420,8 +410,6 @@ class qformat_fronter extends qformat_based_on_xml {
             }
 
             $responses[] = $response;
-            echo 'response coucou 3';
-            var_dump($responses);
         }
     }
 
@@ -484,6 +472,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * @param $questions array of Moodle questions already done.
      */
     protected function process_mc($quest, &$questions) {
+	    $gradeoptionsfull = question_bank::fraction_options_full();
         $question = $this->process_common($quest);
         $question->qtype = 'multichoice';
         $question = $this->add_blank_combined_feedback($question);
@@ -494,8 +483,7 @@ class qformat_fronter extends qformat_based_on_xml {
         }
 
         $answers = $quest->responses;
-        echo "answers";
-        var_dump($answers);
+
         $correctanswers = array();
         foreach ($answers as $answer) {
             if ($answer->title == 'correct') {
@@ -510,15 +498,14 @@ class qformat_fronter extends qformat_based_on_xml {
         foreach ($quest->feedback as $fb) {
             $feedback->{$fb->ident} = trim($fb->text);
         }
-        var_dump($answers);
-        var_dump($correctanswers);
+
         $correctanswersum = array_sum($correctanswers);
         $i = 0;
         foreach ($quest->choices as $choice) {
             $question->answer[$i] = $this->cleaned_text_field(trim($choice->text));
             if (array_key_exists($choice->ident, $correctanswers)) {
                 // Correct answer.
-                $question->fraction[$i] = $correctanswers[$choice->ident]/$correctanswersum;
+                $question->fraction[$i] = match_grade_options($gradeoptionsfull, $correctanswers[$choice->ident]/$correctanswersum, 'nearest');
                 $question->feedback[$i] = $this->cleaned_text_field('');
             } else {
                 // Wrong answer.
@@ -544,18 +531,16 @@ class qformat_fronter extends qformat_based_on_xml {
         if (isset($quest->comment) && $quest->comment != '') {
             $text .= ' '. $quest->comment->text;
         }
-        $questiontext = $this->cleaned_text_field($text);
-        $questiontext = $questiontext['text'];
+        $questiontext = $this->cleaninput($text);
 
         $answers = $quest->responses;
-        echo "answers";
-        var_dump($answers);
 
         $max = 0;
         foreach ($answers as $answer) {
             if ($answer->mark > $max) {
                 $max = $answer->mark;
             }
+			$answerset = $answer->ident[0];
             foreach ($answerset as $ans) {
                 $answermark[$ans['#']] = $answer->mark;
             }
@@ -564,10 +549,11 @@ class qformat_fronter extends qformat_based_on_xml {
         $questiontext .= '<p>{1:MULTICHOICE:';
         foreach ($quest->choices as $choice) {
             $percentage = round($answermark[$choice->ident]/$max*100);
-            $questiontext .= '~%' . $percentage . '%' . $this->cleaned_text_field(trim($choice->text));
+			$choicetext = $this->cleaninput($choice->text);
+            $questiontext .= '~%' . $percentage . '%' . $choicetext;
         }
         $questiontext .= '}</p>';
-        $question = qtype_multianswer_extract_question($questiontext);
+        $question = qtype_multianswer_extract_question(array('text' => $questiontext, 'format' => FORMAT_HTML, 'itemid' => ''));
         $question->questiontext = $question->questiontext['text'];
         $question->name = $this->create_default_question_name($question->questiontext,
                 get_string('defaultname', 'qformat_fronter' , $quest->id));
