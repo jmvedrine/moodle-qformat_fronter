@@ -51,7 +51,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * @return array (of objects) questions objects.
      */
     protected function readquestions($lines) {
-	    question_bank::get_qtype('multianswer'); // Ensure the multianswer code is loaded.
+        question_bank::get_qtype('multianswer'); // Ensure the multianswer code is loaded.
         $text = implode($lines, ' ');
         unset($lines);
         // This converts xml to big nasty data structure,
@@ -306,7 +306,8 @@ class qformat_fronter extends qformat_based_on_xml {
                     array('#', 'presentation', 0, '#', 'flow', 0, '#', 'response_lid', 0, '#', 'render_fib'),
                     false, false)) {
                 if ($this->getpath($data,
-                        array('#', 'presentation', 0, '#', 'flow', 0, '#', 'response_lid', 0, '#', 'render_fib', 0, '#', 'rows'), 0, false) == 1
+                        array('#', 'presentation', 0, '#', 'flow', 0, '#', 'response_lid', 0, '#', 'render_fib', 0, '#', 'rows')
+                        , 0, false) == 1
                         &&  $this->getpath($data, array('#', 'itemfeedback', 0, '#'), false, false)) {
                     return 'shortanswer';
                 } else {
@@ -421,18 +422,18 @@ class qformat_fronter extends qformat_based_on_xml {
      * @param array $feedbacks array of feedbacks suitable for a rawquestion.
      */
     public function process_feedback($feedbackset, &$feedbacks) {
-        foreach ($feedbackset as $bb_feedback) {
+        foreach ($feedbackset as $rawfeedback) {
             $feedback = new stdClass();
-            $feedback->ident = $this->getpath($bb_feedback,
+            $feedback->ident = $this->getpath($rawfeedback,
                     array('@', 'ident'), '', true);
             $feedback->text = '';
-            if ($this->getpath($bb_feedback,
+            if ($this->getpath($rawfeedback,
                     array('#', 'flow_mat', 0), false, false)) {
-                $this->process_block($this->getpath($bb_feedback,
+                $this->process_block($this->getpath($rawfeedback,
                         array('#', 'flow_mat', 0), false, false), $feedback);
-            } else if ($this->getpath($bb_feedback,
+            } else if ($this->getpath($rawfeedback,
                     array('#', 'solution', 0, '#', 'solutionmaterial', 0, '#', 'flow_mat', 0), false, false)) {
-                $this->process_block($this->getpath($bb_feedback,
+                $this->process_block($this->getpath($rawfeedback,
                         array('#', 'solution', 0, '#', 'solutionmaterial', 0, '#', 'flow_mat', 0), false, false), $feedback);
             }
 
@@ -472,7 +473,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * @param $questions array of Moodle questions already done.
      */
     protected function process_mc($quest, &$questions) {
-	    $gradeoptionsfull = question_bank::fraction_options_full();
+        $gradeoptionsfull = question_bank::fraction_options_full();
         $question = $this->process_common($quest);
         $question->qtype = 'multichoice';
         $question = $this->add_blank_combined_feedback($question);
@@ -505,7 +506,8 @@ class qformat_fronter extends qformat_based_on_xml {
             $question->answer[$i] = $this->cleaned_text_field(trim($choice->text));
             if (array_key_exists($choice->ident, $correctanswers)) {
                 // Correct answer.
-                $question->fraction[$i] = match_grade_options($gradeoptionsfull, $correctanswers[$choice->ident]/$correctanswersum, 'nearest');
+                $question->fraction[$i] =
+                        match_grade_options($gradeoptionsfull, $correctanswers[$choice->ident] / $correctanswersum, 'nearest');
                 $question->feedback[$i] = $this->cleaned_text_field('');
             } else {
                 // Wrong answer.
@@ -540,7 +542,7 @@ class qformat_fronter extends qformat_based_on_xml {
             if ($answer->mark > $max) {
                 $max = $answer->mark;
             }
-			$answerset = $answer->ident[0];
+            $answerset = $answer->ident[0];
             foreach ($answerset as $ans) {
                 $answermark[$ans['#']] = $answer->mark;
             }
@@ -548,8 +550,8 @@ class qformat_fronter extends qformat_based_on_xml {
 
         $questiontext .= '<p>{1:MULTICHOICE:';
         foreach ($quest->choices as $choice) {
-            $percentage = round($answermark[$choice->ident]/$max*100);
-			$choicetext = $this->cleaninput($choice->text);
+            $percentage = round($answermark[$choice->ident] / $max * 100);
+            $choicetext = $this->cleaninput($choice->text);
             $questiontext .= '~%' . $percentage . '%' . $choicetext;
         }
         $questiontext .= '}</p>';
@@ -579,17 +581,19 @@ class qformat_fronter extends qformat_based_on_xml {
         $question = $this->process_common($quest);
         $question->qtype = 'essay';
 
-        // Added because essay/questiontype.php:save_question_option is expecting a
-        // fraction property - CT 8/10/06.
         $question->fraction[] = 1;
         $question->defaultmark = 1;
         $question->responseformat = 'editor';
         $question->responsefieldlines = 15;
         $question->attachments = 0;
         $question->graderinfo = $this->text_field('');
-        $question->responsetemplate =  $this->text_field('');
+        $question->responsetemplate = $this->text_field('');
+        $question->feedback = '';
+        $question->responserequired = 1;
+        $question->attachmentsrequired = 0;
+        $question->fraction = 0;
 
-        $questions[]=$question;
+        $questions[] = $question;
     }
 
     /**
@@ -605,6 +609,6 @@ class qformat_fronter extends qformat_based_on_xml {
         $question->qtype = 'description';
         $question->defaultmark = 0;
         $question->length = 0;
-        $questions[]=$question;
+        $questions[] = $question;
     }
 }
