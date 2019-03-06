@@ -3,13 +3,29 @@ Fronter XML question import format
 
 This is the first version of a Moodle plugin to import question made in the Fronter LMS and exported as an XML file.
 
+Written by Jean-Michel Védrine
+
+This Moodle question import format was tested under Moodle 3.1, 3.2, 3.3, 3.4, 3.5, 3.6.
+
 ## Installation
 
-To install, either download the zip file, unzip it, and place it in the moodle/question/format directory. (You will need to rename the directory from "moodle-qformat_fronter" to just "fronter".)
+### Installation from the Moodle plugin directory (prefered method)
 
-Alternatively, get the code using git by running the following command in the top level folder of your Moodle install:
+This question import format is available from https://moodle.org/plugins/view.php?plugin=qformat_fronter
 
-git clone git://github.com/jmvedrine/moodle-qformat_fronter.git question/format/fronter
+Install as any other Moodle question format plugin
+
+#### Installation Using Git
+
+To install using git type these commands in in the top level folder of your Moodle install:
+    clone git://github.com/jmvedrine/moodle-qformat_fronter.git question/format/fronter
+
+
+#### Installation From Downloaded zip file
+
+Alternatively, download the zip from https://github.com/jmvedrine/moodle-qformat_fronter
+
+unzip it into the question/format folder, and then rename the new folder to fronter.
 
 You must visit Site administration and install it like any other Moodle plugin.
 

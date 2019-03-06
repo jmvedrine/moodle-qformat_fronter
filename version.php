@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'qformat_fronter';
-$plugin->version   = 2018050100;
-$plugin->requires  = 2013050100;
-$plugin->release   = '1.04';
+$plugin->version   = 2019030600;
+$plugin->requires  = 2016052300;
+$plugin->release   = '1.05';
 $plugin->maturity  = MATURITY_ALPHA;
