@@ -45,6 +45,6 @@ class qformat_fronter_test extends question_testcase {
         $importer = new qformat_fronter();
         $qs = $importer->readquestions($lines);
 
-        $this->assertEquals(4, count($qs));
+        $this->assertEquals(2, count($qs));
     }
 }
