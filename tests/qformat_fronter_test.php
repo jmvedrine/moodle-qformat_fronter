@@ -15,13 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Unit tests for the Embedded answer (Cloze) question importer.
+ * Unit tests for the Fronter question importer.
  *
  * @package   qformat_fronter
  * @copyright 2019 Jean-Michel Vedrine
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -45,7 +44,6 @@ class qformat_fronter_test extends question_testcase {
 
         $importer = new qformat_fronter();
         $qs = $importer->readquestions($lines);
-
 
         $this->assertEquals(4, count($qs));
     }
