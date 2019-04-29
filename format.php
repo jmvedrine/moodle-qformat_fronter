@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Blackboard V5 and V6 question importer.
+ * Fronter XML question importer.
  *
  * @package    qformat_fronter
  * @copyright  2013 Jean-Michel Vedrine
@@ -26,6 +26,14 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->libdir . '/xmlize.php');
 
+/**
+ * The Fronter XML question format filter was designed as an easy to use
+ * method for teachers wanting to reuse questions exported from the Fronter
+ * LMS in Moodle
+ *
+ * @copyright  2013 Jean-Michel Vedrine
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
 class qformat_fronter extends qformat_based_on_xml {
     public function provide_import() {
         return true;
@@ -37,7 +45,7 @@ class qformat_fronter extends qformat_based_on_xml {
 
     /**
      * For now this is just a wrapper for cleaninput.
-     * @param string text text to parse and recode
+     * @param string $text Text to parse and recode
      * @return array with keys text, format, itemid.
      */
     public function cleaned_text_field($text) {
@@ -47,7 +55,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * Parse the xml document into an array of questions
      * this *could* burn memory - but it won't happen that much
      * so fingers crossed!
-     * @param $lines array of lines from the input file.
+     * @param array $lines Array of lines from the input file.
      * @return array (of objects) questions objects.
      */
     public function readquestions($lines) {
@@ -226,6 +234,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * Helper function to process an XML block into an object.
      * Can call himself recursively if necessary to parse this branch of the XML tree.
      * @param array $curblock XML block to parse
+     * @param object $block block already parsed so far
      * @return object $block parsed
      */
     public function process_block($curblock, $block) {
@@ -289,6 +298,11 @@ class qformat_fronter extends qformat_based_on_xml {
         return $block;
     }
 
+    /**
+     * Helper function determine the question type
+     * @param array $data XML <item> question  data
+     * @return string question type
+     */
     protected function find_item_type($data) {
         if ($this->getpath($data,
                 array('#', 'resprocessing'),
@@ -470,7 +484,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * Parse a multichoice single answer rawquestion and add the result
      * to the array of questions already parsed.
      * @param object $quest rawquestion
-     * @param $questions array of Moodle questions already done.
+     * @param array $questions array of Moodle questions already done.
      */
     protected function process_mc($quest, &$questions) {
         $gradeoptionsfull = question_bank::fraction_options_full();
@@ -524,7 +538,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * Parse a Drop Down Select menu rawquestion and add the result
      * to the array of questions already parsed.
      * @param object $quest rawquestion
-     * @param $questions array of Moodle questions already done.
+     * @param array $questions array of Moodle questions already done.
      */
     protected function process_select($quest, &$questions) {
         // By default these questions will be imported as multianswer questions.
@@ -574,7 +588,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * Parse an essay rawquestion and add the result
      * to the array of questions already parsed.
      * @param object $quest rawquestion
-     * @param $questions array of Moodle questions already done.
+     * @param array $questions array of Moodle questions already done.
      */
     public function process_essay($quest, &$questions) {
 
@@ -601,7 +615,7 @@ class qformat_fronter extends qformat_based_on_xml {
      * Parse a description rawquestion and add the result
      * to the array of questions already parsed.
      * @param object $quest rawquestion
-     * @param $questions array of Moodle questions already done.
+     * @param array $questions array of Moodle questions already done.
      */
     public function process_description($quest, &$questions) {
 
